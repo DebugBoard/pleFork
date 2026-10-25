@@ -55,6 +55,7 @@ import com.drdisagree.pixellauncherenhanced.data.common.Constants.WIDGET_BACKGRO
 import com.drdisagree.pixellauncherenhanced.data.common.Constants.WIDGET_BLUR_RADIUS
 import com.drdisagree.pixellauncherenhanced.data.common.Constants.WIDGET_BLUR_TINT
 import com.drdisagree.pixellauncherenhanced.data.common.Constants.WIDGET_CLEAR_BACKGROUND
+import com.drdisagree.pixellauncherenhanced.data.common.Constants.WIDGET_TRANSITION_SHADOW
 import com.drdisagree.pixellauncherenhanced.data.common.PanelBackground
 import com.drdisagree.pixellauncherenhanced.data.glass.GlassStyle
 import com.drdisagree.pixellauncherenhanced.data.glass.GlassTarget
@@ -102,6 +103,7 @@ class BlurPanels(context: Context) : ModPack(context) {
     private var widgetBlurRadius = 0
     private var widgetBlurTint = 0
     private var widgetClearBackground = false
+    private var hideTransitionShadow = false
     private var searchBlurRadius = 0
     private var searchBlurTint = 0
     private var searchLiquid = false
@@ -151,6 +153,7 @@ class BlurPanels(context: Context) : ModPack(context) {
             widgetStyle = GlassTarget.WIDGETS.readStyle(this::getSliderInt, this::getInt)
             widgetGlass = widgetEnabled
             widgetClearBackground = widgetEnabled || getBoolean(WIDGET_CLEAR_BACKGROUND, false)
+            hideTransitionShadow = getBoolean(WIDGET_TRANSITION_SHADOW, false)
             val searchBackground = PanelBackground.supported(getString(SEARCH_BAR_BACKGROUND, BACKGROUND_OFF))
             val searchEnabled = searchBackground != BACKGROUND_OFF
             searchBlurRadius = if (searchEnabled) getSliderInt(SEARCH_BAR_BLUR_RADIUS, DEFAULT_BLUR) else 0
@@ -340,6 +343,14 @@ class BlurPanels(context: Context) : ModPack(context) {
         findClass("com.android.quickstep.views.FloatingWidgetBackgroundView", suppressError = true)
             .hookMethod("init")
             .suppressError()
+            .runBefore { param ->
+                if (!hideTransitionShadow) return@runBefore
+
+                // init(hostView, backgroundView, finalRadius, fallbackBackgroundColor):
+                // the colour is its only int, and it is what paints the shadow.
+                val colour = param.args.indexOfLast { it is Int }
+                if (colour >= 0) param.args[colour] = Color.TRANSPARENT
+            }
             .runAfter { param ->
                 val view = param.thisObject as View
                 view.installFloatingWidgetPanel()
