@@ -99,6 +99,7 @@ object Constants {
     const val HOME_ENDLESS_SCROLLING = "xposed_homeendlessscrolling"
     const val HOME_PAGE_TRANSITION = "xposed_homepagetransition"
     const val FREE_WIDGET_RESIZE = "xposed_freewidgetresize"
+    const val WIDGET_TRANSITION_SHADOW = "xposed_widgettransitionshadow"
     const val DRAWER_SEARCH_BAR = "xposed_drawersearchbar"
     const val DRAWER_SEARCH_BACKGROUND = "xposed_drawersearchbackground"
     const val DRAWER_SEARCH_BLUR_RADIUS = "xposed_drawersearchblurradius"
